@@ -125,12 +125,30 @@ class NaNoSidebar(QtGui.QPlainTextEdit):
 
     def check_force_exit(self):
         """
-        check_force_exit() replaces #16
-        check force-exit requirements from #16
+        check force-exit requirements from #1:
+        a) a minimum wordcount per day that hasn't been reached 
+           during a certain number of days in a row
+        b) a minimum percentage of total wordcount hasn't been reached
+        c) work has been nil for a certain number of days
+
+        cutoff: percent, minimum, days
         """
-        #TODO Write some code
-        pass
+        recent_days = [] #TODO See read_logs() for self.cutoff_days back
+        day_goal = self.goal/self.days
+        min_wordcount_reached = False        
         
+        for day in recent_days:
+            if day > day_goal * cutoff_minimum:
+                min_wordcount_reached = True
+                break
+        if nano_day =< self.cutoff_days:
+            min_wordcount_reached = True
+        elif self.words > day_goal * nano_day * cutoff_minimum:
+            min_wordcount_reached = True
+
+        if not min_wordcount_reached:
+            self.nano_mode = False
+            #TODO Print error 'NaNo mode deactivated'
 
 def read_stats(nano_day, stats_dir):
     """
@@ -163,6 +181,7 @@ def read_logs(logfile_days, nano_day):
     read current logs, #12
         - file -> array
     """
+    #TODO Return last self.minimum_days of wcounts (for check_force_exit) 
     with open(logfile_days) as f:
         log_lines = f.read().splitlines()
     logged_day = 0
