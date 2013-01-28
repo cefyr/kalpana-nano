@@ -88,7 +88,7 @@ class NaNoSidebar(QtGui.QPlainTextEdit):
                 read_logs(self.logfile_days, self.nano_day)
                 sb_text = update_sb(self.get_text(), self.endpoint, self.goal, 
                                     self.words_today, self.days, self.nano_day, 
-                                    self.ideal_length, self.stats)
+                                    self.ideal_chapter, self.stats)
                 self.setPlainText(sb_text)
                 return 'NaNo mode initiated', False
             else:
@@ -106,7 +106,7 @@ class NaNoSidebar(QtGui.QPlainTextEdit):
         if self.nanowidget.nano_mode:
             sb_text = update_sb(get_text(), self.endpoint, self.goal, 
                                 self.words_today, self.days, self.nano_day, 
-                                self.ideal_length, self.stats)
+                                self.ideal_chapter, self.stats)
             self.setPlainText(sb_text)
             write_logs()
             self.check_force_exit()
@@ -119,7 +119,7 @@ class NaNoSidebar(QtGui.QPlainTextEdit):
         if self.nano_mode:
             sb_text = update_sb(self.get_text(), self.endpoint, self.goal, 
                                 self.words_today, self.days, self.nano_day, 
-                                self.ideal_length, self.stats)
+                                self.ideal_chapter, self.stats)
             self.setPlainText(sb_text)
             self.setVisible(abs(self.isVisible()-1))
 
@@ -130,7 +130,7 @@ class NaNoSidebar(QtGui.QPlainTextEdit):
         """
         #TODO Write some code
         pass
-    
+        
 
 def read_stats(nano_day, stats_dir):
     """
@@ -206,7 +206,7 @@ def count_words(raw_text, endpoint):
                 for item in chapter_text.split(endpoint)[0]]
     return chapters
 
-def update_sb(raw_text, endpoint, goal, words_today, days, nano_day, ideal_length, stats):
+def update_sb(raw_text, endpoint, goal, words_today, days, nano_day, ideal_chapter, stats):
     """
     update_sb() replaces nanoGenerateStats
     wordcounts -> sidebar
@@ -233,7 +233,7 @@ def update_sb(raw_text, endpoint, goal, words_today, days, nano_day, ideal_lengt
     text = 'DAY {0}, {1:.2%}\n\n'.format(nano_day, percent)  
     for item in chapters:
         line = '{} {} {}\n'.format(chapters.index(item), item, 
-                                   item - ideal_length)
+                                   item - ideal_chapter)
         text += line
     text += '\nTOTAL {}\n'.format(sum(chapters))
     text += 'Today {}\n'.format() #NOTE What's the variable called?
