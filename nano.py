@@ -17,7 +17,7 @@
 
 
 import datetime, os, os.path, re 
-import pluginlib
+import pluginlib, common
 from math import ceil
 from common import QtGui, Qt
 
@@ -55,7 +55,15 @@ class NaNoSidebar(QtGui.QPlainTextEdit):
 
         self.nano_day = 0 
         self.nano_mode = False
-        # endpoint, goal, days and ideal_length are taken from config
+
+        cfg = common.read_json(os.path.join(self.path, 'cfg.json'))
+        self.endpoint = cfg['endpoint']
+        self.goal = int(cfg['goal'])
+        self.days = int(cfg['days'])
+        self.ideal_chapter = int(cfg['ideal_chapter'])
+        self.cutoff_percent = int(cfg['cutoff_percent'])
+        self.cutoff_minimum = int(cfg['cutoff_minimum'])
+        self.cutoff_days = int(cfg['cutoff_days'])
         
         self.path = path
         self.stats_dir = os.path.join(self.path, 'stats')

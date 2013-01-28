@@ -1,0 +1,11 @@
+{
+  "nano": {
+    "days": 29, 
+    "endpoint": "SLUTPUNKT", 
+    "goal": 50000, 
+    "ideal_chapter": 3600,
+    "cutoff_percent": 50,
+    "cutoff_minimum": 10,
+    "cutoff_days": 5
+  }
+}
