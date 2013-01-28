@@ -19,13 +19,7 @@
 import datetime, os, os.path, re 
 import pluginlib
 from math import ceil
-
-try:
-    from PySide import QtGui
-    from PySide.QtCore import Qt
-except ImportError:
-    from PyQt4 import QtGui
-    from PyQt4.QtCore import Qt
+from common import QtGui, Qt
 
 class UserPlugin(pluginlib.GUIPlugin)
     def start(self):
@@ -65,7 +59,7 @@ class NaNoSidebar(QtGui.QPlainTextEdit):
         
         self.path = path
         self.stats_dir = os.path.join(self.path, 'stats')
-        self.get_filename = get_filename #NOTE WTF is this unused???
+        self.get_filename = get_filename 
         self.logfile_days = #TODO
         self.logfile_chapters = #TODO
 
@@ -153,15 +147,15 @@ def read_stats(nano_day, stats_dir):
         stats.sort()
     return stats 
 
-def read_logs(logfile, nano_day):
+def read_logs(logfile_days, nano_day):
     """
-    Read log, return last day's wordcount.
+    Read log, return last recorded wordcount of day before nano_day.
 
     read_logs() replaces nanoCountWordsChapters + #12
     read current logs, #12
         - file -> array
     """
-    with open(logfile) as f:
+    with open(logfile_days) as f:
         log_lines = f.read().splitlines()
     logged_day = 0
     logged_words = 0
