@@ -68,8 +68,8 @@ class NaNoSidebar(QtGui.QPlainTextEdit):
         self.path = path
         self.stats_dir = os.path.join(self.path, 'stats')
         self.get_filename = get_filename 
-        self.logfile_days = #TODO
-        self.logfile_chapters = #TODO
+        self.logfile_days = os.path.join(self.get_filename(), '.logd')
+        self.logfile_chapters = os.path.join(self.get_filename(), '.logc')
 
     def activate(self, arg):
         """
@@ -148,7 +148,8 @@ class NaNoSidebar(QtGui.QPlainTextEdit):
 
         if not min_wordcount_reached:
             self.nano_mode = False
-            #TODO Print error 'NaNo mode deactivated'
+            #TODO Print error 'NaNo mode deactivated' (future pluginlib method)
+            #TODO Do other shit also possibly?
 
 def read_stats(nano_day, stats_dir):
     """
