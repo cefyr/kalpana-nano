@@ -100,18 +100,18 @@ class NaNoSidebar(QtGui.QPlainTextEdit):
         
     def update_wordcount(self):
         if self.nano_mode:
-            wcount = sum(self.count_words(self.endpoint, 
-                         self.get_text())) 
+            wcount = sum(count_words(self.get_text(), self.endpoint))
         return wcount
 
     def save(self):
         if self.nano_mode:
             sb_text = update_sb(self.get_text(), self.endpoint, self.goal,
-                                self.words_yesterday, self.days, self.nano_day, 
+                                self.words_yesterday, self.days, self.nano_day,
                                 self.ideal_chapter, self.stats)
             self.setPlainText(sb_text)
-            write_logs(self.pathname, self.logfile_chapters, self.logfile_days,
-                       self.nano_day, update_wordcount())
+            write_logs(self.get_filepath(), self.logfile_chapters,
+                       self.logfile_days, self.nano_day, 
+                       count_words(self.get_text(), self.endpoint))
             self.check_force_exit()
             #self.setPlainText(self.nanowidget.nanoGenerateStats())
             #self.nanoLogStats()
