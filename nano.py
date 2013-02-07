@@ -183,17 +183,18 @@ def read_logs(logfile_days, nano_day):
         - file -> array
     """
     #TODO Return last self.minimum_days of wcounts (for check_force_exit) 
-    #TODO If log exists, do this, otherwise return 0
-    with open(logfile_days) as f:
-        log_lines = f.read().splitlines()
-    logged_day = 0
     logged_words = 0
-    for line in log_lines:
-        logged_day = int(line.split(', ')[1])
-        if logged_day < nano_day:
-            logged_words = int(line.split(', ')[2])
-        else:
-            break
+    if os.path.exists(logfile_days):    
+        with open(logfile_days) as f:
+            log_lines = f.read().splitlines()
+        logged_day = 0
+        logged_words = 0
+        for line in log_lines:
+            logged_day = int(line.split(', ')[1])
+            if logged_day < nano_day:
+                logged_words = int(line.split(', ')[2])
+            else:
+                break
     return logged_words
 
 def write_logs(source_file, logpath_c, logpath_d, day, chapters):
