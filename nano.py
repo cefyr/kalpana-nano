@@ -110,7 +110,7 @@ class NaNoSidebar(QtGui.QPlainTextEdit):
                                 self.words_today, self.days, self.nano_day, 
                                 self.ideal_chapter, self.stats)
             self.setPlainText(sb_text)
-            write_logs() #TODO args are /path/to/log_c, /path/to/log_d
+            write_logs() #TODO args are /path/to/log_c, /path/to/log_d, self.nano_day, wordcount
             self.check_force_exit()
             #self.setPlainText(self.nanowidget.nanoGenerateStats())
             #self.nanoLogStats()
@@ -195,7 +195,7 @@ def read_logs(logfile_days, nano_day):
             break
     return logged_words
 
-def write_logs(logpath_c, logpath_d):
+def write_logs(logpath_c, logpath_d, day, words):
     """
     write_logs() replaces nanoLogStats
     write logs
@@ -205,11 +205,22 @@ def write_logs(logpath_c, logpath_d):
     """
     logfile_chapters = logpath_c
     logfile_dates = logpath_d
-
     dateform = '%Y-%m-%d %H:%M:%S'
-    last_count = 
-    with open(logfile_dates, 'a') as logd:
-        logd.writeline(last_count)
+    curr_date = datetime.datetime.now().strftime(dateform)
+    curr_day = day
+    curr_words = words
+    
+    # Parse last line in dat logfile
+    with open(logfile_dates, 'r') as logd:
+        logd_line = logd.readlines()[-1].split('\n')[0]
+    logd_day = int(logd_line.split(', ')[1].split(' = ')[0])
+    logd_words = int(logd_line.split(', ')[1].split(' = ')[1])
+
+    # Log current wordcount if it's not a duplicate
+    if not (curr_day == logd_day and curr_words == logd_words):
+        logline_d = '{}, {} = {}\n'.format(curr_date, curr_day, curr_words)
+        with open(logfile_dates, 'a') as logd:
+            logd.writeline(logline_d)
 
 def count_words(raw_text, endpoint):
     """
