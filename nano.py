@@ -137,8 +137,8 @@ class NaNoSidebar(QtGui.QPlainTextEdit):
         """
         recent_days = [] #TODO See read_logs() for self.cutoff_days back
         day_goal = self.goal/self.days
-        min_wordcount_reached = False        
-        
+        min_wordcount_reached = False  
+
         for day in recent_days:
             if day > day_goal * cutoff_minimum:
                 min_wordcount_reached = True
@@ -184,7 +184,7 @@ def read_logs(logfile_days, nano_day):
     """
     #TODO Return last self.minimum_days of wcounts (for check_force_exit) 
     logged_words = 0
-    if os.path.exists(logfile_days):    
+    if os.path.exists(logfile_days): 
         with open(logfile_days) as f:
             log_lines = f.read().splitlines()
         logged_day = 0
@@ -237,23 +237,14 @@ def write_logs(source_file, logpath_c, logpath_d, day, chapters):
 
 def count_words(raw_text, endpoint):
     """
-    count_words() replaces nanoCountWordsChapters
-    count words per chapter
-    - exclude comments, #20
-    - regex + file? -> array
+    Using regex, return list of wordcounts per chapter.
+    Split into chapters at (newlines + chapter start)
     """
-    # Join lines and remove comments.
-    # Split into chapters at (newlines + chapter start)
     text = re.sub(r'\[.*?\]', '', raw_text, re.DOTALL)
-    #TODO Maybe make chapter divisions less hard-coded?
     chapter_text = re.split(r'\n{3}(?=KAPITEL|CHAPTER)', text)
-    # list comp, for each chapter:
-    # remove words after endpoint
-    # return length of given_chapter.split()
-    # return total words as well?
-    chapters = [len(re.findall(r'\S+', item)) 
-                for item in chapter_text.split(endpoint)[0]]
-    return chapters
+    chapters = [item.split(endpoint)[0] for item in chapter_text]
+    chapter_wordcounts = [len(re.findall(r'\S+', item)) for item in chapters] 
+    return chapter_wordcounts
 
 def update_sb(raw_text, endpoint, goal, words_yesterday, days, nano_day, ideal_chapter, stats):
     """
@@ -279,7 +270,7 @@ def update_sb(raw_text, endpoint, goal, words_yesterday, days, nano_day, ideal_c
     percent = total/goal
     words_today = sum(chapters) - words_yesterday
     diff_today = words_today - (goal - sum(chapters))/(days - nano_day)
-    text = 'DAY {0}, {1:.2%}\n\n'.format(nano_day, percent)  
+    text = 'DAY {0}, {1:.2%}\n\n'.format(nano_day, percent)
     for item in chapters:
         line = '{} {} {}\n'.format(chapters.index(item), item, 
                                    item - ideal_chapter)
