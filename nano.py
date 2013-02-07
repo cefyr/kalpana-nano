@@ -106,7 +106,7 @@ class NaNoSidebar(QtGui.QPlainTextEdit):
 
     def save(self):
         if self.nano_mode:
-            sb_text = update_sb(get_text(), self.endpoint, self.goal, 
+            sb_text = update_sb(self.get_text(), self.endpoint, self.goal,
                                 self.words_yesterday, self.days, self.nano_day, 
                                 self.ideal_chapter, self.stats)
             self.setPlainText(sb_text)
