@@ -60,13 +60,13 @@ class NaNoSidebar(QtGui.QPlainTextEdit):
         self.nano_mode = False
 
         cfg = common.read_json(os.path.join(self.path, 'cfg.json')) #TODO Kalpana should fix this 
-        self.endpoint = cfg['endpoint']
-        self.goal = int(cfg['goal'])
-        self.days = int(cfg['days'])
-        self.ideal_chapter = int(cfg['ideal_chapter'])
-        self.cutoff_percent = int(cfg['cutoff_percent'])
-        self.cutoff_minimum = int(cfg['cutoff_minimum'])
-        self.cutoff_days = int(cfg['cutoff_days'])
+        self.endpoint = cfg['nano']['endpoint']
+        self.goal = int(cfg['nano']['goal'])
+        self.days = int(cfg['nano']['days'])
+        self.ideal_chapter = int(cfg['nano']['ideal_chapter'])
+        self.cutoff_percent = int(cfg['nano']['cutoff_percent'])
+        self.cutoff_minimum = int(cfg['nano']['cutoff_minimum'])
+        self.cutoff_days = int(cfg['nano']['cutoff_days'])
         
         self.path = path
         self.stats_dir = os.path.join(self.path, 'stats')
