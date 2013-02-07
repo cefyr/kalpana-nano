@@ -110,7 +110,8 @@ class NaNoSidebar(QtGui.QPlainTextEdit):
                                 self.words_yesterday, self.days, self.nano_day, 
                                 self.ideal_chapter, self.stats)
             self.setPlainText(sb_text)
-            write_logs() #TODO args are /path/to/log_c, /path/to/log_d, self.nano_day, wordcount
+            write_logs(self.pathname, self.logfile_chapters, self.logfile_days,
+                       self.nano_day, update_wordcount())
             self.check_force_exit()
             #self.setPlainText(self.nanowidget.nanoGenerateStats())
             #self.nanoLogStats()
