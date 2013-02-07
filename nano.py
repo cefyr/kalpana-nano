@@ -195,7 +195,7 @@ def read_logs(logfile_days, nano_day):
             break
     return logged_words
 
-def write_logs(logpath_c, logpath_d, day, words):
+def write_logs(source_file, logpath_c, logpath_d, day, chapters):
     """
     write_logs() replaces nanoLogStats
     write logs
@@ -203,13 +203,22 @@ def write_logs(logpath_c, logpath_d, day, words):
         - overwrite/non-overwrite, #21 
             The point is to keep the earliest of identical wordcounts.
     """
+    filepath = source_file
     logfile_chapters = logpath_c
     logfile_dates = logpath_d
     dateform = '%Y-%m-%d %H:%M:%S'
     curr_date = datetime.datetime.now().strftime(dateform)
     curr_day = day
-    curr_words = words
+    curr_words = sum(chapters)
     
+    # Replace chapters log with current chapter wordcounts
+    head1 = 'STATISTICS FILE - CHAPTERS'
+    head2 = 'CHAPTER = WORDS'
+    chapter_head = '{}\n{}\n\n{}\n'.format(head1, filepath, head2)
+    chapter_lines = ['{} = {}\n'.format(chapters.index(c), c) for c in chapters]
+    with open(logfile_chapters, 'w') as logc:
+        logc.write(''.join(chapter_lines))
+
     # Parse last line in dat logfile
     with open(logfile_dates, 'r') as logd:
         logd_line = logd.readlines()[-1].split('\n')[0]
@@ -221,6 +230,8 @@ def write_logs(logpath_c, logpath_d, day, words):
         logline_d = '{}, {} = {}\n'.format(curr_date, curr_day, curr_words)
         with open(logfile_dates, 'a') as logd:
             logd.writeline(logline_d)
+
+
 
 def count_words(raw_text, endpoint):
     """
