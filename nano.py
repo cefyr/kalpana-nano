@@ -19,12 +19,13 @@
 import datetime, os, os.path, re 
 import pluginlib, common
 from math import ceil
-from common import QtGui, Qt
+from PyQt4 import QtGui
+from PyQt4.QtCore import Qt
 
 
 class UserPlugin(pluginlib.GUIPlugin):
     def start(self):
-        self.nanowidget = NaNoSidebar(self.path, self.get_filename, self.get_text)
+        self.nanowidget = NaNoSidebar(self.path, self.get_filepath, self.get_text)
         self.add_widget(self.nanowidget, pluginlib.EAST) 
         self.hotkeys = {'Ctrl+P': self.nanowidget.toggle_sidebar}
         self.commands = {'nn': (self.nanowidget.activate, 
@@ -36,7 +37,7 @@ class UserPlugin(pluginlib.GUIPlugin):
 
 class NaNoSidebar(QtGui.QPlainTextEdit):
     # Nano stuff including empty sidebar
-    def __init__(self, path, get_filename, get_text):
+    def __init__(self, path, get_filepath, get_text):
         QtGui.QLineEdit.__init__(self, None)
         self.setVisible(False)
         self.setReadOnly(True)
@@ -69,9 +70,9 @@ class NaNoSidebar(QtGui.QPlainTextEdit):
         
         self.path = path
         self.stats_dir = os.path.join(self.path, 'stats')
-        self.get_filename = get_filename 
-        self.logfile_days = os.path.join(self.get_filename(), '.logd')
-        self.logfile_chapters = os.path.join(self.get_filename(), '.logc')
+        self.get_filepath = get_filepath 
+        self.logfile_days = os.path.join(self.get_filepath(), '.logd')
+        self.logfile_chapters = os.path.join(self.get_filepath(), '.logc')
 
     def activate(self, arg):
         """
