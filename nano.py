@@ -108,7 +108,7 @@ class NaNoSidebar(QtGui.QPlainTextEdit):
                                 self.words_today, self.days, self.nano_day, 
                                 self.ideal_chapter, self.stats)
             self.setPlainText(sb_text)
-            write_logs()
+            write_logs() #TODO args are /path/to/log_c, /path/to/log_d
             self.check_force_exit()
             #self.setPlainText(self.nanowidget.nanoGenerateStats())
             #self.nanoLogStats()
@@ -195,7 +195,7 @@ def read_logs(logfile_days, nano_day):
             break
     return logged_words
 
-def write_logs():
+def write_logs(logpath_c, logpath_d):
     """
     write_logs() replaces nanoLogStats
     write logs
@@ -203,8 +203,13 @@ def write_logs():
         - overwrite/non-overwrite, #21 
             The point is to keep the earliest of identical wordcounts.
     """
-    #TODO Write some code
-    pass
+    logfile_chapters = logpath_c
+    logfile_dates = logpath_d
+
+    dateform = '%Y-%m-%d %H:%M:%S'
+    last_count = 
+    with open(logfile_dates, 'a') as logd:
+        logd.writeline(last_count)
 
 def count_words(raw_text, endpoint):
     """
