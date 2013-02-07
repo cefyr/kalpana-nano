@@ -89,7 +89,7 @@ class NaNoSidebar(QtGui.QPlainTextEdit):
                 self.stats = read_stats(self.nano_day, self.stats_dir)
                 self.words_yesterday = read_logs(self.logfile_days, self.nano_day)
                 sb_text = update_sb(self.get_text(), self.endpoint, self.goal, 
-                                    self.words_today, self.days, self.nano_day, 
+                                    self.words_yesterday, self.days, self.nano_day, 
                                     self.ideal_chapter, self.stats)
                 self.setPlainText(sb_text)
                 return 'NaNo mode initiated', False
@@ -107,7 +107,7 @@ class NaNoSidebar(QtGui.QPlainTextEdit):
     def save(self):
         if self.nano_mode:
             sb_text = update_sb(get_text(), self.endpoint, self.goal, 
-                                self.words_today, self.days, self.nano_day, 
+                                self.words_yesterday, self.days, self.nano_day, 
                                 self.ideal_chapter, self.stats)
             self.setPlainText(sb_text)
             write_logs() #TODO args are /path/to/log_c, /path/to/log_d, self.nano_day, wordcount
@@ -120,7 +120,7 @@ class NaNoSidebar(QtGui.QPlainTextEdit):
         """
         if self.nano_mode:
             sb_text = update_sb(self.get_text(), self.endpoint, self.goal, 
-                                self.words_today, self.days, self.nano_day, 
+                                self.words_yesterday, self.days, self.nano_day, 
                                 self.ideal_chapter, self.stats)
             self.setPlainText(sb_text)
             self.setVisible(abs(self.isVisible()-1))
@@ -254,7 +254,7 @@ def count_words(raw_text, endpoint):
                 for item in chapter_text.split(endpoint)[0]]
     return chapters
 
-def update_sb(raw_text, endpoint, goal, words_today, days, nano_day, ideal_chapter, stats):
+def update_sb(raw_text, endpoint, goal, words_yesterday, days, nano_day, ideal_chapter, stats):
     """
     update_sb() replaces nanoGenerateStats
     wordcounts -> sidebar
@@ -276,6 +276,7 @@ def update_sb(raw_text, endpoint, goal, words_today, days, nano_day, ideal_chapt
     form = '{}' #NOTE This should be that thing with right-justified shit
     chapters = count_words(raw_text, endpoint) 
     percent = total/goal
+    words_today = sum(chapters) - words_yesterday
     diff_today = words_today - (goal - sum(chapters))/(days - nano_day)
     text = 'DAY {0}, {1:.2%}\n\n'.format(nano_day, percent)  
     for item in chapters:
