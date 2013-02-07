@@ -106,7 +106,7 @@ class NaNoSidebar(QtGui.QPlainTextEdit):
 
     def save(self):
         if self.nano_mode:
-            sb_text = update_sb(self.get_text(), self.endpoint, self.goal,
+            sb_text = update_sb(get_text(), self.endpoint, self.goal, 
                                 self.words_yesterday, self.days, self.nano_day, 
                                 self.ideal_chapter, self.stats)
             self.setPlainText(sb_text)
@@ -267,7 +267,7 @@ def update_sb(raw_text, endpoint, goal, words_yesterday, days, nano_day, ideal_c
     #NOTE Handle width of sidebar
     form = '{}' #NOTE This should be that thing with right-justified shit
     chapters = count_words(raw_text, endpoint) 
-    percent = sum(chapters)/goal
+    percent = total/goal
     words_today = sum(chapters) - words_yesterday
     diff_today = words_today - (goal - sum(chapters))/(days - nano_day)
     text = 'DAY {0}, {1:.2%}\n\n'.format(nano_day, percent)
@@ -276,7 +276,7 @@ def update_sb(raw_text, endpoint, goal, words_yesterday, days, nano_day, ideal_c
                                    item - ideal_chapter)
         text += line
     text += '\nTOTAL {}\n'.format(sum(chapters))
-    text += 'Today {}\n'.format(words_today) #NOTE What's the variable called?
+    text += 'Today {}\n'.format() #NOTE What's the variable called?
     text += 'Todo {}\n'.format(diff_today)
     text += '\nEarlier stats\n'
     for item in stats:
