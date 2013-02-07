@@ -49,7 +49,7 @@ class NaNoSidebar(QtGui.QPlainTextEdit):
         font.setPointSize(10)
         self.setFont(font)
 
-        self.path = path
+        self.pluginpath = path
         self.get_text = get_text
 
         self.nano_width = 20 #TODO What is this?
@@ -59,7 +59,7 @@ class NaNoSidebar(QtGui.QPlainTextEdit):
         self.nano_day = 0 
         self.nano_mode = False
 
-        cfg = common.read_json(os.path.join(self.path, 'cfg.json')) #TODO Kalpana should fix this 
+        cfg = common.read_json(os.path.join(self.pluginpath, 'cfg.json'))
         self.endpoint = cfg['nano']['endpoint']
         self.goal = int(cfg['nano']['goal'])
         self.days = int(cfg['nano']['days'])
@@ -68,11 +68,8 @@ class NaNoSidebar(QtGui.QPlainTextEdit):
         self.cutoff_minimum = int(cfg['nano']['cutoff_minimum'])
         self.cutoff_days = int(cfg['nano']['cutoff_days'])
         
-        self.path = path
-        self.stats_dir = os.path.join(self.path, 'stats')
+        self.stats_dir = os.path.join(self.pluginpath, 'stats')
         self.get_filepath = get_filepath 
-        self.logfile_days = os.path.join(self.get_filepath(), '.logd')
-        self.logfile_chapters = os.path.join(self.get_filepath(), '.logc')
 
     def activate(self, arg):
         """
@@ -87,6 +84,9 @@ class NaNoSidebar(QtGui.QPlainTextEdit):
             elif int(arg.strip()) in range(1,self.days + 1):
                 self.inano_day = int(arg.strip())
                 self.nano_mode = True
+                self.logfile_days = self.get_filepath() + '.logd'
+                self.logfile_chapters = self.get_filepath() + '.logc'
+                print(self.logfile_days)
                 read_stats(self.nano_day, self.stats_dir)
                 read_logs(self.logfile_days, self.nano_day)
                 sb_text = update_sb(self.get_text(), self.endpoint, self.goal, 
@@ -106,7 +106,7 @@ class NaNoSidebar(QtGui.QPlainTextEdit):
         return wcount
 
     def save(self):
-        if self.nanowidget.nano_mode:
+        if self.nano_mode:
             sb_text = update_sb(get_text(), self.endpoint, self.goal, 
                                 self.words_today, self.days, self.nano_day, 
                                 self.ideal_chapter, self.stats)
@@ -184,6 +184,7 @@ def read_logs(logfile_days, nano_day):
         - file -> array
     """
     #TODO Return last self.minimum_days of wcounts (for check_force_exit) 
+    #TODO If log exists, do this, otherwise return 0
     with open(logfile_days) as f:
         log_lines = f.read().splitlines()
     logged_day = 0
