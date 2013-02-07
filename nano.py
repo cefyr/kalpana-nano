@@ -21,7 +21,8 @@ import pluginlib, common
 from math import ceil
 from common import QtGui, Qt
 
-class UserPlugin(pluginlib.GUIPlugin)
+
+class UserPlugin(pluginlib.GUIPlugin):
     def start(self):
         self.nanowidget = NaNoSidebar(self.path, self.get_filename, self.get_text)
         self.add_widget(self.nanowidget, pluginlib.EAST) 
@@ -46,7 +47,8 @@ class NaNoSidebar(QtGui.QPlainTextEdit):
         font.setFamily("Monospace")
         font.setPointSize(10)
         self.setFont(font)
-        
+
+        self.path = path
         self.get_text = get_text
 
         self.nano_width = 20 #TODO What is this?
@@ -56,7 +58,7 @@ class NaNoSidebar(QtGui.QPlainTextEdit):
         self.nano_day = 0 
         self.nano_mode = False
 
-        cfg = common.read_json(os.path.join(self.path, 'cfg.json'))
+        cfg = common.read_json(os.path.join(self.path, 'cfg.json')) #TODO Kalpana should fix this 
         self.endpoint = cfg['endpoint']
         self.goal = int(cfg['goal'])
         self.days = int(cfg['days'])
@@ -141,7 +143,7 @@ class NaNoSidebar(QtGui.QPlainTextEdit):
             if day > day_goal * cutoff_minimum:
                 min_wordcount_reached = True
                 break
-        if nano_day =< self.cutoff_days:
+        if nano_day <= self.cutoff_days:
             min_wordcount_reached = True
         elif self.words > day_goal * nano_day * cutoff_minimum:
             min_wordcount_reached = True
@@ -167,9 +169,7 @@ def read_stats(nano_day, stats_dir):
             with open(log) as f:
                 # daily_stats has lines of log for one year
                 lines = f.readlines()
-            stats_this_day = [log.split('.')] + 
-                             [day.split(', ')[2] for day in lines 
-                             if int(day.split(', ')[1]) == nano_day] 
+            stats_this_day = [log.split('.')] + [day.split(', ')[2] for day in lines if int(day.split(', ')[1]) == nano_day] 
             stats.append(stats_this_day)
         stats.sort()
     return stats 
@@ -253,8 +253,7 @@ def update_sb(raw_text, endpoint, goal, words_today, days, nano_day, ideal_chapt
     form = '{}' #NOTE This should be that thing with right-justified shit
     chapters = count_words(raw_text, endpoint) 
     percent = total/goal
-    diff_today = words_today - (goal - sum(chapters))/
-                                    (days - nano_day)
+    diff_today = words_today - (goal - sum(chapters))/(days - nano_day)
     text = 'DAY {0}, {1:.2%}\n\n'.format(nano_day, percent)  
     for item in chapters:
         line = '{} {} {}\n'.format(chapters.index(item), item, 
