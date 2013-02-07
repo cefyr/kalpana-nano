@@ -86,9 +86,8 @@ class NaNoSidebar(QtGui.QPlainTextEdit):
                 self.nano_mode = True
                 self.logfile_days = self.get_filepath() + '.logd'
                 self.logfile_chapters = self.get_filepath() + '.logc'
-                print(self.logfile_days)
-                read_stats(self.nano_day, self.stats_dir)
-                read_logs(self.logfile_days, self.nano_day)
+                self.stats = read_stats(self.nano_day, self.stats_dir)
+                self.words_yesterday = read_logs(self.logfile_days, self.nano_day)
                 sb_text = update_sb(self.get_text(), self.endpoint, self.goal, 
                                     self.words_today, self.days, self.nano_day, 
                                     self.ideal_chapter, self.stats)
