@@ -209,24 +209,33 @@ def write_logs(source_file, logpath_c, logpath_d, day, chapters):
     filepath = source_file
     logfile_chapters = logpath_c
     logfile_dates = logpath_d
+    logd_day = 0
+    logd_words = 0
     dateform = '%Y-%m-%d %H:%M:%S'
     curr_date = datetime.datetime.now().strftime(dateform)
     curr_day = day
     curr_words = sum(chapters)
     
     # Replace chapters log with current chapter wordcounts
-    head1 = 'STATISTICS FILE - CHAPTERS'
-    head2 = 'CHAPTER = WORDS'
-    chapter_head = '{}\n{}\n\n{}\n'.format(head1, filepath, head2)
+    logc_head1 = 'STATISTICS FILE - CHAPTERS'
+    logc_head2 = 'CHAPTER = WORDS'
+    chapter_head = '{}\n{}\n\n{}\n'.format(logc_head1, filepath, logc_head2)
     chapter_lines = ['{} = {}\n'.format(chapters.index(c), c) for c in chapters]
     with open(logfile_chapters, 'w') as logc:
         logc.write(''.join(chapter_lines))
 
-    # Parse last line in dat logfile
-    with open(logfile_dates, 'r') as logd:
-        logd_line = logd.readlines()[-1].split('\n')[0]
-    logd_day = int(logd_line.split(', ')[1].split(' = ')[0])
-    logd_words = int(logd_line.split(', ')[1].split(' = ')[1])
+    if os.path.exists(logfile_dates):
+        # Parse last line in dat logfile
+        with open(logfile_dates, 'r') as logd:
+            logd_line = logd.readlines()[-1].split('\n')[0]
+        logd_day = int(logd_line.split(', ')[1].split(' = ')[0])
+        logd_words = int(logd_line.split(', ')[1].split(' = ')[1])
+    else:
+        logd_head1 = 'STATISTICS FILE - DATES'
+        logd_head2 = 'DATE, DAY = WORDS'
+        date_head = '{}\n{}\n\n{}\n'.format(logd_head1, filepath, logd_head2)
+        with open(logfile_dates) as logd:
+            logd.write(date_head)
 
     # Log current wordcount if it's not a duplicate
     if not (curr_day == logd_day and curr_words == logd_words):
