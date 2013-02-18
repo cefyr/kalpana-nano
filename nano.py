@@ -52,7 +52,7 @@ class NaNoSidebar(QtGui.QPlainTextEdit):
         self.pluginpath = path
         self.get_text = get_text
 
-        self.nano_width = 20 #TODO What is this?
+        self.nano_width = 20 #TODO I think this is width in chars
         char_width = self.fontMetrics().averageCharWidth()
         self.setFixedWidth((self.nano_width + 1)*char_width)
 
@@ -258,9 +258,6 @@ def count_words(raw_text, endpoint):
 
 def update_sb(raw_text, endpoint, goal, words_yesterday, days, nano_day, ideal_chapter, stats):
     """
-    update_sb() replaces nanoGenerateStats
-    wordcounts -> sidebar
-
     Sidebar syntax:
         DAY nano_day
         % of total goal
@@ -274,23 +271,32 @@ def update_sb(raw_text, endpoint, goal, words_yesterday, days, nano_day, ideal_c
         Earlier years:
         Year diff_from_this_year
     """
-    #NOTE Handle width of sidebar
-    form = '{}' #NOTE This should be that thing with right-justified shit
+    form = '{label:<7}{count:>5}{diff:>7}'
     chapters = count_words(raw_text, endpoint) 
     percent = sum(chapters)/goal
+    lines = (form.format(label=chapters.index(item), count=item, 
+                diff = (item - ideal_chapter) if chapters.index(item) else '')
+             for item in chapters)
     words_today = sum(chapters) - words_yesterday
-    diff_today = words_today - (goal - sum(chapters))/(days - nano_day)
-    text = 'DAY {0}, {1:.2%}\n\n'.format(nano_day, percent)
-    for item in chapters:
-        line = '{} {} {}\n'.format(chapters.index(item), item, 
-                                   item - ideal_chapter)
-        text += line
-    text += '\nTOTAL {}\n'.format(sum(chapters))
-    text += 'Today {}\n'.format(words_today)
-    text += 'Todo {}\n'.format(diff_today)
-    text += '\nEarlier stats\n'
-    for item in stats:
-        line = '{} {}\n'.format(item[0], item[1])
-        text += line
+    diff_today = words_today - (goal - sum(chapters))//(days - nano_day)
+    earlier_years = ('{} {}'.format(year, diff) for year,diff in stats)
+    daily_goal = goal/days
+    text = """\
+DAY {day}, {percent:.2%}
+
+{chapters}
+
+{total}
+{today}
+
+Earlier years:
+{stats}""".format(day=nano_day, 
+                  percent=percent,
+                  chapters='\n'.join(lines), 
+                  total=form.format(label='TOTAL', count=sum(chapters), 
+                                    diff=sum(chapters) - goal),
+                  today=form.format(label='TODAY', count=words_today, 
+                                    diff=diff_today), 
+                  stats='\n'.join(earlier_years))
     return text
 
