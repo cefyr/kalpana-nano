@@ -136,21 +136,21 @@ class NaNoSidebar(QtGui.QPlainTextEdit):
 
         cutoff: percent, minimum, days
         """
-        recent_days = [] #TODO See read_logs() for self.cutoff_days back
-        day_goal = self.goal/self.days
-        min_wordcount_reached = False  
-
-        for day in recent_days:
-            if day > day_goal * cutoff_minimum:
-                min_wordcount_reached = True
-                break
-        if nano_day <= self.cutoff_days:
-            min_wordcount_reached = True
-        elif self.words > day_goal * nano_day * cutoff_minimum:
-            min_wordcount_reached = True
-
-        if not min_wordcount_reached:
-            self.nano_mode = False
+##        recent_days = [] #TODO See read_logs() for self.cutoff_days back
+##        day_goal = self.goal/self.days
+##        min_wordcount_reached = False  
+##
+##        for day in recent_days:
+##            if day > day_goal * cutoff_minimum:
+##                min_wordcount_reached = True
+##                break
+##        if self.nano_day <= self.cutoff_days:
+##            min_wordcount_reached = True
+##        elif self.words > day_goal * nano_day * cutoff_minimum:
+##            min_wordcount_reached = True
+##
+##        if not min_wordcount_reached:
+##            self.nano_mode = False
             #TODO Print error 'NaNo mode deactivated' (future pluginlib method)
             #TODO Do other shit also possibly?
 
@@ -202,9 +202,8 @@ def write_logs(source_file, logpath_c, logpath_d, day, chapters):
     filepath = source_file
     logfile_chapters = logpath_c
     logfile_dates = logpath_d
-    logd_day = 0
-    logd_words = 0
     dateform = '%Y-%m-%d %H:%M:%S'
+    logd_rx = re.compile(r'\d{4}-\d\d-\d\d \d\d:\d\d:\d\d, \d\d? = \d+$')
     curr_date = datetime.datetime.now().strftime(dateform)
     curr_day = day
     curr_words = sum(chapters)
@@ -212,30 +211,33 @@ def write_logs(source_file, logpath_c, logpath_d, day, chapters):
     # Replace chapters log with current chapter wordcounts
     logc_head1 = 'STATISTICS FILE - CHAPTERS'
     logc_head2 = 'CHAPTER = WORDS'
-    chapter_head = '{}\n{}\n\n{}\n'.format(logc_head1, filepath, logc_head2)
-    chapter_lines = ['{} = {}\n'.format(chapters.index(c), c) for c in chapters]
+    chapter_head = '{}\n{}\n\n{}'.format(logc_head1, filepath, logc_head2)
+    chapter_lines = [chapter_head] + ['{} = {}'.format(chapters.index(c), c) 
+                     for c in chapters]
     with open(logfile_chapters, 'w') as logc:
-        logc.write(''.join(chapter_lines))
+        logc.write('\n'.join(chapter_lines))
 
     if os.path.exists(logfile_dates):
-        # Parse last line in dat logfile
         with open(logfile_dates, 'r') as logd:
-            logd_line = logd.readlines()[-1].split('\n')[0]
-        logd_day = int(logd_line.split(', ')[1].split(' = ')[0])
-        logd_words = int(logd_line.split(', ')[1].split(' = ')[1])
+            logd_lines = logd.read().splitlines()
+        matches = [(0,0)] + [l.split(', ')[1].split(' = ')
+                   for l in logd_lines if logd_rx.match(l)]
+        logd_day = int(matches[-1][0])
+        logd_words = int(matches[-1][1])
     else:
         logd_head1 = 'STATISTICS FILE - DATES'
         logd_head2 = 'DATE, DAY = WORDS'
         date_head = '{}\n{}\n\n{}\n'.format(logd_head1, filepath, logd_head2)
         with open(logfile_dates, 'w') as logd:
             logd.write(date_head)
+        logd_day = 0
+        logd_words = 0
 
     # Log current wordcount if it's not a duplicate
     if not (curr_day == logd_day and curr_words == logd_words):
         logline_d = '{}, {} = {}\n'.format(curr_date, curr_day, curr_words)
         with open(logfile_dates, 'a') as logd:
             logd.write(logline_d)
-
 
 
 def count_words(raw_text, endpoint):
