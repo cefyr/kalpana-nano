@@ -178,25 +178,18 @@ def read_stats(nano_day, stats_dir):
 def read_logs(logfile_days, nano_day):
     """
     Read log, return last recorded wordcount of day before nano_day.
-
-    read_logs() replaces nanoCountWordsChapters + #12
-    read current logs, #12
-        - file -> array
     """
     #TODO Return last self.minimum_days of wcounts (for check_force_exit) 
-    logged_words = 0
     if os.path.exists(logfile_days): 
         with open(logfile_days) as f:
             log_lines = f.read().splitlines()
-        logged_day = 0
-        logged_words = 0
-        for line in log_lines:
-            logged_day = int(line.split(', ')[1])
-            if logged_day < nano_day:
-                logged_words = int(line.split(', ')[2])
-            else:
-                break
-    return logged_words
+        log_rx = re.compile(r'\d{4}-\d\d-\d\d \d\d:\d\d:\d\d, \d\d? = \d+$')
+        matches = [l.split(', ')[1].split(' = ')
+                   for l in log_lines if log_rx.match(l)]
+        wordcounts = [0] + [int(words) for day, words in matches
+                            if int(day) < nano_day]
+        return wordcounts[-1]
+    return 0
 
 def write_logs(source_file, logpath_c, logpath_d, day, chapters):
     """
@@ -234,14 +227,14 @@ def write_logs(source_file, logpath_c, logpath_d, day, chapters):
         logd_head1 = 'STATISTICS FILE - DATES'
         logd_head2 = 'DATE, DAY = WORDS'
         date_head = '{}\n{}\n\n{}\n'.format(logd_head1, filepath, logd_head2)
-        with open(logfile_dates) as logd:
+        with open(logfile_dates, 'w') as logd:
             logd.write(date_head)
 
     # Log current wordcount if it's not a duplicate
     if not (curr_day == logd_day and curr_words == logd_words):
         logline_d = '{}, {} = {}\n'.format(curr_date, curr_day, curr_words)
         with open(logfile_dates, 'a') as logd:
-            logd.writeline(logline_d)
+            logd.write(logline_d)
 
 
 
