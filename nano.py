@@ -17,7 +17,8 @@
 
 
 import datetime, os, os.path, re 
-import pluginlib, common
+import pluginlib
+from libsyntyche import common
 from math import ceil
 from PyQt4 import QtGui
 from PyQt4.QtCore import Qt
