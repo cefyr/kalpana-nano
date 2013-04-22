@@ -83,7 +83,7 @@ class NaNoSidebar(QtGui.QPlainTextEdit):
                 self.nano_mode = False
                 return 'NaNo mode disabled', False
             elif int(arg.strip()) in range(1,self.days + 1):
-                self.inano_day = int(arg.strip())
+                self.nano_day = int(arg.strip())
                 self.nano_mode = True
                 self.logfile_days = self.get_filepath() + '.logd'
                 self.logfile_chapters = self.get_filepath() + '.logc'
