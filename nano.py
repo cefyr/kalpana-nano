@@ -273,9 +273,9 @@ def update_sb(raw_text, endpoint, goal, words_yesterday, days, nano_day, ideal_c
     form = '{label:<7}{count:>5}{diff:>7}'
     chapters = count_words(raw_text, endpoint, chapter_div) 
     percent = sum(chapters)/goal
-    lines = (form.format(label=chapters.index(item), count=item, 
-                diff = (item - ideal_chapter) if chapters.index(item) else '')
-             for item in chapters)
+    lines = (form.format(label=n, count=item,
+                diff = (item - ideal_chapter) if n > 0 else '')
+             for n,item in enumerate(chapters))
     words_today = sum(chapters) - words_yesterday
     diff_today = words_today - (goal - sum(chapters))//(days - nano_day)
     earlier_years = ('{} {}'.format(year, diff) for year,diff in stats)
