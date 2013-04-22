@@ -62,6 +62,7 @@ class NaNoSidebar(QtGui.QPlainTextEdit):
 
         cfg = common.read_json(os.path.join(self.pluginpath, 'cfg.json'))
         self.endpoint = cfg['nano']['endpoint']
+        self.chapter_div = '|'.join(cfg['nano']['chapter_division'])
         self.goal = int(cfg['nano']['goal'])
         self.days = int(cfg['nano']['days'])
         self.ideal_chapter = int(cfg['nano']['ideal_chapter'])
@@ -91,7 +92,7 @@ class NaNoSidebar(QtGui.QPlainTextEdit):
                 self.words_yesterday = read_logs(self.logfile_days, self.nano_day)
                 sb_text = update_sb(self.get_text(), self.endpoint, self.goal, 
                                     self.words_yesterday, self.days, self.nano_day, 
-                                    self.ideal_chapter, self.stats)
+                                    self.ideal_chapter, self.stats, self.chapter_div)
                 self.setPlainText(sb_text)
                 return 'NaNo mode initiated', False
             else:
@@ -101,18 +102,20 @@ class NaNoSidebar(QtGui.QPlainTextEdit):
         
     def update_wordcount(self):
         if self.nano_mode:
-            wcount = sum(count_words(self.get_text(), self.endpoint))
+            wcount = sum(count_words(self.get_text(), self.endpoint, 
+                                     self.chapter_div))
         return wcount
 
     def save(self):
         if self.nano_mode:
             sb_text = update_sb(self.get_text(), self.endpoint, self.goal,
                                 self.words_yesterday, self.days, self.nano_day,
-                                self.ideal_chapter, self.stats)
+                                self.ideal_chapter, self.stats, self.chapter_div)
             self.setPlainText(sb_text)
             write_logs(self.get_filepath(), self.logfile_chapters,
                        self.logfile_days, self.nano_day, 
-                       count_words(self.get_text(), self.endpoint))
+                       count_words(self.get_text(), self.endpoint, 
+                                   self.chapter_div))
             self.check_force_exit()
             #self.setPlainText(self.nanowidget.nanoGenerateStats())
             #self.nanoLogStats()
@@ -123,7 +126,7 @@ class NaNoSidebar(QtGui.QPlainTextEdit):
         if self.nano_mode:
             sb_text = update_sb(self.get_text(), self.endpoint, self.goal, 
                                 self.words_yesterday, self.days, self.nano_day, 
-                                self.ideal_chapter, self.stats)
+                                self.ideal_chapter, self.stats, self.chapter_div)
             self.setPlainText(sb_text)
             self.setVisible(abs(self.isVisible()-1))
 
@@ -241,18 +244,18 @@ def write_logs(source_file, logpath_c, logpath_d, day, chapters):
             logd.write(logline_d)
 
 
-def count_words(raw_text, endpoint):
+def count_words(raw_text, endpoint, chapter_div):
     """
     Using regex, return list of wordcounts per chapter.
     Split into chapters at (newlines + chapter start)
     """
     text = re.sub(r'\[.*?\]', '', raw_text, re.DOTALL)
-    chapter_text = re.split(r'\n{3}(?=KAPITEL|CHAPTER)', text)
+    chapter_text = re.split(r'\n{{3}}(?={})'.format(chapter_div), text)
     chapters = [item.split(endpoint)[0] for item in chapter_text]
     chapter_wordcounts = [len(re.findall(r'\S+', item)) for item in chapters] 
     return chapter_wordcounts
 
-def update_sb(raw_text, endpoint, goal, words_yesterday, days, nano_day, ideal_chapter, stats):
+def update_sb(raw_text, endpoint, goal, words_yesterday, days, nano_day, ideal_chapter, stats, chapter_div):
     """
     Sidebar syntax:
         DAY nano_day
@@ -268,7 +271,7 @@ def update_sb(raw_text, endpoint, goal, words_yesterday, days, nano_day, ideal_c
         Year diff_from_this_year
     """
     form = '{label:<7}{count:>5}{diff:>7}'
-    chapters = count_words(raw_text, endpoint) 
+    chapters = count_words(raw_text, endpoint, chapter_div) 
     percent = sum(chapters)/goal
     lines = (form.format(label=chapters.index(item), count=item, 
                 diff = (item - ideal_chapter) if chapters.index(item) else '')

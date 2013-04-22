@@ -1,6 +1,12 @@
 {
   "nano": {
     "days": 29, 
+    "chapter_division": [
+        "KAPITEL",
+        "Kapitel",
+        "CHAPTER",
+        "Chapter"
+    ],
     "endpoint": "SLUTPUNKT", 
     "goal": 50000, 
     "ideal_chapter": 3600,
