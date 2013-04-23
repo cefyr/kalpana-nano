@@ -169,12 +169,18 @@ def read_stats(nano_day, stats_dir):
     # if stats directory exists:
     stats = []
     if os.path.exists(stats_dir):
-        raw_stats = os.listdir(self.stats_dir)
+        raw_stats = os.listdir(stats_dir)
         for log in raw_stats:
-            with open(log) as f:
+            with open(os.path.join(stats_dir, log)) as f:
                 # daily_stats has lines of log for one year
-                lines = f.readlines()
-            stats_this_day = [log.split('.')] + [day.split(', ')[2] for day in lines if int(day.split(', ')[1]) == nano_day] 
+                lines = f.read().splitlines()
+                print(lines)
+##            stats_this_day = [log.split('.')] + [day.split(', ')[2]
+##                             for day in lines
+##                             if int(day.split(', ')[1]) == nano_day]
+            stats_this_day = [log.split('_')[0]] + [day.split('\t')[1]
+                             for day in lines
+                             if int(day.split('\t')[0]) == nano_day]
             stats.append(stats_this_day)
         stats.sort()
     return stats 
